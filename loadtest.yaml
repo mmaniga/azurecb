@@ -1,0 +1,17 @@
+config:
+  target: "ws://localhost:8030"
+  phases:
+    - duration: 20  # Test for 20 seconds
+      arrivalRate: 1 # Every second, add 10 users
+      name: "Ramping up the load"
+  payload:
+    path: "userNames.csv"
+    fields:
+      - "message"
+    order: sequence
+    skipHeader: true
+scenarios:
+  - engine: "ws"
+    flow:
+      - send: "{{ message }}"
+      - think: 100

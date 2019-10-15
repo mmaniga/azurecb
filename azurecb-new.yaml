@@ -1,0 +1,81 @@
+apiVersion: apps/v1beta1
+kind: Deployment
+metadata:
+  name: redis-server
+  namespace: ingress-basic
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: redis-server
+  template:
+    metadata:
+      labels:
+        app: redis-server
+    spec:
+      nodeSelector:
+        "beta.kubernetes.io/os": linux
+      containers:
+        - name: redis-server
+          image: redis
+          ports:
+            - containerPort: 6379
+              name: redis
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: redis-server
+  namespace: ingress-basic
+spec:
+  ports:
+    - port: 6379
+  selector:
+    app: redis-server
+---
+apiVersion: apps/v1beta1
+kind: Deployment
+metadata:
+  name: cbprojectnode-app
+  namespace: ingress-basic
+spec:
+  replicas: 1
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+  minReadySeconds: 5
+  template:
+    metadata:
+      labels:
+        app: cbprojectnode-app
+    spec:
+      nodeSelector:
+        "beta.kubernetes.io/os": linux
+      containers:
+        - name:  cbproject-app
+          image: acrcbazure.azurecr.io/cbproject_nide-app:v5
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8030
+          resources:
+            requests:
+              cpu: 250m
+            limits:
+              cpu: 500m
+          env:
+            - name: REDIS
+              value: "redis-server"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: cbprojectnode-app-lb
+  namespace: ingress-basic
+spec:
+  ports:
+    - port: 80
+      targetPort: 8030
+      protocol: TCP
+  selector:
+    app: cbprojectnode-app

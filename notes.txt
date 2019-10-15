@@ -1,0 +1,345 @@
+muthusamy@Azure:~$ az group create --name rg-cbazure --location eastus
+{
+  "id": "/subscriptions/f79d7343-26a2-4693-9d6c-6f7938de3518/resourceGroups/rg-cbazure",
+  "location": "eastus",
+  "managedBy": null,
+  "name": "rg-cbazure",
+  "properties": {
+    "provisioningState": "Succeeded"
+  },
+  "tags": null,
+  "type": "Microsoft.Resources/resourceGroups"
+}
+
+muthusamy@Azure:~$ az acr create --resource-group rg-cbazure --name acrCBAzure --sku Basic
+{
+  "adminUserEnabled": false,
+  "creationDate": "2019-10-06T17:19:52.905014+00:00",
+  "id": "/subscriptions/f79d7343-26a2-4693-9d6c-6f7938de3518/resourceGroups/rg-cbazure/providers/Microsoft.ContainerRegistry/registries/acrCBAzure",
+  "location": "eastus",
+  "loginServer": "acrcbazure.azurecr.io",
+  "name": "acrCBAzure",
+  "networkRuleSet": null,
+  "policies": {
+    "quarantinePolicy": {
+      "status": "disabled"
+    },
+    "retentionPolicy": {
+      "days": 7,
+      "lastUpdatedTime": "2019-10-06T17:19:54.248727+00:00",
+      "status": "disabled"
+    },
+    "trustPolicy": {
+      "status": "disabled",
+      "type": "Notary"
+    }
+  },
+  "provisioningState": "Succeeded",
+  "resourceGroup": "rg-cbazure",
+  "sku": {
+    "name": "Basic",
+    "tier": "Basic"
+  },
+  "status": null,
+  "storageAccount": null,
+  "tags": {},
+  "type": "Microsoft.ContainerRegistry/registries"
+}
+
+
+manigandanm-a01:CBProject manigandanm$ az acr login --name acrCBAzure
+
+manigandanm-a01:CBProject manigandanm$ docker tag  cbproject_nide-app acrcbazure.azurecr.io/cbproject_nide-app:v3
+
+
+
+
+manigandanm-a01:CBProject manigandanm$ docker push acrcbazure.azurecr.io/cbproject_nide-app:v3
+The push refers to repository [acrcbazure.azurecr.io/cbproject_nide-app]
+63029b65d42b: Pushed
+dad23571b268: Pushed
+7e5232135929: Pushed
+6ff5e9ab06fc: Pushed
+414e34102ae8: Pushed
+7dcca1b6d2c7: Pushed
+1a86ff1d449f: Pushed
+f1b5933fe4b5: Pushed
+v3: digest: sha256:4f4d7a136ba4578e6263ed70f92b45589819ee432a8d32c4741a78d89558ae16 size: 1993
+
+
+
+
+muthusamy@Azure:~$ az ad sp create-for-rbac --skip-assignment
+{
+  "appId": "41500071-4521-48c3-b507-635f7613bede",
+  "displayName": "azure-cli-2019-10-06-17-33-43",
+  "name": "http://azure-cli-2019-10-06-17-33-43",
+  "password": "7df5c7ea-c088-44a3-ba7d-6d71eeda5346",
+  "tenant": "b39138ca-3cee-4b4a-a4d6-cd83d9dd62f0"
+}
+
+muthusamy@Azure:~$ az acr show --resource-group rg-cbazure --name acrCBAzure --query "id" --output tsv
+/subscriptions/f79d7343-26a2-4693-9d6c-6f7938de3518/resourceGroups/rg-cbazure/providers/Microsoft.ContainerRegistry/registries/acrCBAzure
+
+
+muthusamy@Azure:~$ az role assignment create --assignee 41500071-4521-48c3-b507-635f7613bede  --scope /subscriptions/f79d7343-26a2-4693-9d6c-6f7938de3518/resourceGroups/rg-cbazure/providers/Microsoft.ContainerRegistry/registries/acrCBAzure --role acrpull
+{
+  "canDelegate": null,
+  "id": "/subscriptions/f79d7343-26a2-4693-9d6c-6f7938de3518/resourceGroups/rg-cbazure/providers/Microsoft.ContainerRegistry/registries/acrCBAzure/providers/Microsoft.Authorization/roleAssignments/7b7c7c61-b2d5-43ee-8deb-7a6813bccf33",
+  "name": "7b7c7c61-b2d5-43ee-8deb-7a6813bccf33",
+  "principalId": "fa188947-6165-43db-b12f-b02ce03e3c27",
+  "principalType": "ServicePrincipal",
+  "resourceGroup": "rg-cbazure",
+  "roleDefinitionId": "/subscriptions/f79d7343-26a2-4693-9d6c-6f7938de3518/providers/Microsoft.Authorization/roleDefinitions/7f951dda-4ed3-4680-a7ca-43fe172d538d",
+  "scope": "/subscriptions/f79d7343-26a2-4693-9d6c-6f7938de3518/resourceGroups/rg-cbazure/providers/Microsoft.ContainerRegistry/registries/acrCBAzure",
+  "type": "Microsoft.Authorization/roleAssignments"
+}
+
+
+
+
+az aks create --resource-group rg-cbazure --name cb-akscluster --node-count 2 --service-principal 41500071-4521-48c3-b507-635f7613bede --client-secret 7df5c7ea-c088-44a3-ba7d-6d71eeda5346 --generate-ssh-keys
+
+
+muthusamy@Azure:~$ az aks create --resource-group rg-cbazure --name cb-akscluster --node-count 2 --service-principal 41500071-4521-48c3-b507-635f7613bede --client-secret 7df5c7ea-c088-44a3-ba7d-6d71eeda5346 --generate-ssh-keys
+{
+  "aadProfile": null,
+  "addonProfiles": null,
+  "agentPoolProfiles": [
+    {
+      "availabilityZones": null,
+      "count": 2,
+      "enableAutoScaling": null,
+      "enableNodePublicIp": null,
+      "maxCount": null,
+      "maxPods": 110,
+      "minCount": null,
+      "name": "nodepool1",
+      "nodeTaints": null,
+      "orchestratorVersion": "1.13.10",
+      "osDiskSizeGb": 100,
+      "osType": "Linux",
+      "provisioningState": "Succeeded",
+      "scaleSetEvictionPolicy": null,
+      "scaleSetPriority": null,
+      "type": "AvailabilitySet",
+      "vmSize": "Standard_DS2_v2",
+      "vnetSubnetId": null
+    }
+  ],
+  "apiServerAccessProfile": null,
+  "dnsPrefix": "cb-aksclus-rg-cbazure-f79d73",
+  "enablePodSecurityPolicy": null,
+  "enableRbac": true,
+  "fqdn": "cb-aksclus-rg-cbazure-f79d73-fedf1280.hcp.eastus.azmk8s.io",
+  "id": "/subscriptions/f79d7343-26a2-4693-9d6c-6f7938de3518/resourcegroups/rg-cbazure/providers/Microsoft.ContainerService/managedClusters/cb-akscluster",
+  "identity": null,
+  "kubernetesVersion": "1.13.10",
+  "linuxProfile": {
+    "adminUsername": "azureuser",
+    "ssh": {
+      "publicKeys": [
+        {
+          "keyData": "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCskC7QbX1H7eOf+ewFubLeaJcaLNVnr2zSmordQBm0KHxYFiRLDR4zwgEDTw3nBLW0Jf+T2HJj/eW2DTT6H6ybdbse1gb9ZI5/FvQIev5TNRissnlO7B+Vcn6xmk32NVyMUHoxWz96VoA/gUACfFBhjCedBcqYbVYPZAViSXljijM9r4U2rfmLdYKG4AojoxojQ21EcwuQfGsgPOmMw3scjNY9feZc9flISPNVS6tdNtrnZ66CCCH6kOiTHa1kSsGO8j+RlEhPVjhFS1nwwJE7F3VMRBI/7ZUzSlkLSJsUcJqamRKR7ZQbpYDGksPQpjxr1ngJ405dE2EjElSbVaBl"
+        }
+      ]
+    }
+  },
+  "location": "eastus",
+  "maxAgentPools": 1,
+  "name": "cb-akscluster",
+  "networkProfile": {
+    "dnsServiceIp": "10.0.0.10",
+    "dockerBridgeCidr": "172.17.0.1/16",
+    "loadBalancerProfile": null,
+    "loadBalancerSku": "Basic",
+    "networkPlugin": "kubenet",
+    "networkPolicy": null,
+    "podCidr": "10.244.0.0/16",
+    "serviceCidr": "10.0.0.0/16"
+  },
+  "nodeResourceGroup": "MC_rg-cbazure_cb-akscluster_eastus",
+  "provisioningState": "Succeeded",
+  "resourceGroup": "rg-cbazure",
+  "servicePrincipalProfile": {
+    "clientId": "41500071-4521-48c3-b507-635f7613bede",
+    "secret": null
+  },
+  "tags": null,
+  "type": "Microsoft.ContainerService/ManagedClusters",
+  "windowsProfile": null
+}
+
+muthusamy@Azure:~$ az aks get-credentials --resource-group rg-cbazure --name cb-akscluster
+Merged "cb-akscluster" as current context in /home/muthusamy/.kube/config
+
+muthusamy@Azure:~$ az acr list  --resource-group rg-cbazure --query "[].{acrLoginServer:loginServer}" --output table
+AcrLoginServer
+---------------------
+acrcbazure.azurecr.io
+
+
+
+muthusamy@Azure:~$ helm init
+$HELM_HOME has been configured at /home/muthusamy/.helm.
+
+Tiller (the Helm server-side component) has been installed into your Kubernetes Cluster.
+
+Please note: by default, Tiller is deployed with an insecure 'allow unauthenticated users' policy.
+To prevent this, run `helm init` with the --tiller-tls-verify flag.
+For more information on securing your installation see: https://docs.helm.sh/using_helm/#securing-your-helm-installation
+muthusamy@Azure:~$
+
+
+
+
+
+
+muthusamy@Azure:~$ helm install stable/nginx-ingress     --namespace ingress-basic     --set controller.replicaCount=2     --set controller.nodeSelector."beta\.kubernetes\.io/os"=linux     --set defaultBackend.nodeSelector."beta\.kubernetes\.io/os"=linux
+NAME:   yodeling-elephant
+LAST DEPLOYED: Sun Oct  6 19:39:49 2019
+NAMESPACE: ingress-basic
+STATUS: DEPLOYED
+
+RESOURCES:
+==> v1/Deployment
+NAME                                             READY  UP-TO-DATE  AVAILABLE  AGE
+yodeling-elephant-nginx-ingress-controller       0/2    2           0          1s
+yodeling-elephant-nginx-ingress-default-backend  0/1    1           0          1s
+
+==> v1/Pod(related)
+NAME                                                             READY  STATUS             RESTARTS  AGE
+yodeling-elephant-nginx-ingress-controller-68c6b5547f-5nzmp      0/1    ContainerCreating  0         1s
+yodeling-elephant-nginx-ingress-controller-68c6b5547f-9xqf5      0/1    ContainerCreating  0         1s
+yodeling-elephant-nginx-ingress-default-backend-5cb7767bcf4cw7b  0/1    ContainerCreating  0         1s
+
+==> v1/Service
+NAME                                             TYPE          CLUSTER-IP    EXTERNAL-IP  PORT(S)                     AGE
+yodeling-elephant-nginx-ingress-controller       LoadBalancer  10.0.2.191    <pending>    80:31171/TCP,443:30733/TCP  1s
+yodeling-elephant-nginx-ingress-default-backend  ClusterIP     10.0.117.187  <none>       80/TCP                      1s
+
+==> v1/ServiceAccount
+NAME                                     SECRETS  AGE
+yodeling-elephant-nginx-ingress          1        1s
+yodeling-elephant-nginx-ingress-backend  1        1s
+
+==> v1beta1/ClusterRole
+NAME                             AGE
+yodeling-elephant-nginx-ingress  1s
+
+==> v1beta1/ClusterRoleBinding
+NAME                             AGE
+yodeling-elephant-nginx-ingress  1s
+
+==> v1beta1/PodDisruptionBudget
+NAME                                        MIN AVAILABLE  MAX UNAVAILABLE  ALLOWED DISRUPTIONS  AGE
+yodeling-elephant-nginx-ingress-controller  1              N/A              0                    1s
+
+==> v1beta1/Role
+NAME                             AGE
+yodeling-elephant-nginx-ingress  1s
+
+==> v1beta1/RoleBinding
+NAME                             AGE
+yodeling-elephant-nginx-ingress  1s
+
+
+NOTES:
+The nginx-ingress controller has been installed.
+It may take a few minutes for the LoadBalancer IP to be available.
+You can watch the status by running 'kubectl --namespace ingress-basic get services -o wide -w yodeling-elephant-nginx-ingress-controller'
+
+An example Ingress that makes use of the controller:
+
+  apiVersion: extensions/v1beta1
+  kind: Ingress
+  metadata:
+    annotations:
+      kubernetes.io/ingress.class: nginx
+    name: example
+    namespace: foo
+  spec:
+    rules:
+      - host: www.example.com
+        http:
+          paths:
+            - backend:
+                serviceName: exampleService
+                servicePort: 80
+              path: /
+    # This section is only required if TLS is to be enabled for the Ingress
+    tls:
+        - hosts:
+            - www.example.com
+          secretName: example-tls
+
+If TLS is enabled for the Ingress, a Secret containing the certificate and key must also be provided:
+
+  apiVersion: v1
+  kind: Secret
+  metadata:
+    name: example-tls
+    namespace: foo
+  data:
+    tls.crt: <base64 encoded cert>
+    tls.key: <base64 encoded key>
+  type: kubernetes.io/tls
+
+
+muthusamy@Azure:~$ kubectl get service -l app=nginx-ingress --namespace ingress-basic
+NAME                                              TYPE           CLUSTER-IP     EXTERNAL-IP     PORT(S)                      AGE
+yodeling-elephant-nginx-ingress-controller        LoadBalancer   10.0.2.191     52.168.70.236   80:31171/TCP,443:30733/TCP   2m2s
+yodeling-elephant-nginx-ingress-default-backend   ClusterIP      10.0.117.187   <none>          80/TCP                       2m2s
+
+
+
+muthusamy@Azure:~$ ./createDns.sh
+{
+  "ddosSettings": null,
+  "dnsSettings": {
+    "domainNameLabel": "demo-akscb-ingress",
+    "fqdn": "demo-akscb-ingress.eastus.cloudapp.azure.com",
+    "reverseFqdn": null
+  },
+  "etag": "W/\"6f872587-ef79-4d89-8b5c-820c12c9c4df\"",
+  "id": "/subscriptions/f79d7343-26a2-4693-9d6c-6f7938de3518/resourceGroups/MC_rg-cbazure_cb-akscluster_eastus/providers/Microsoft.Network/publicIPAddresses/kubernetes-a0fafeeb9e87111e981926689594c045",
+  "idleTimeoutInMinutes": 4,
+  "ipAddress": "52.168.70.236",
+  "ipConfiguration": {
+    "etag": null,
+    "id": "/subscriptions/f79d7343-26a2-4693-9d6c-6f7938de3518/resourceGroups/MC_rg-cbazure_cb-akscluster_eastus/providers/Microsoft.Network/loadBalancers/kubernetes/frontendIPConfigurations/a0fafeeb9e87111e981926689594c045",
+    "name": null,
+    "privateIpAddress": null,
+    "privateIpAllocationMethod": null,
+    "provisioningState": null,
+    "publicIpAddress": null,
+    "resourceGroup": "MC_rg-cbazure_cb-akscluster_eastus",
+    "subnet": null
+  },
+  "ipTags": [],
+  "location": "eastus",
+  "name": "kubernetes-a0fafeeb9e87111e981926689594c045",
+  "provisioningState": "Succeeded",
+  "publicIpAddressVersion": "IPv4",
+  "publicIpAllocationMethod": "Static",
+  "publicIpPrefix": null,
+  "resourceGroup": "MC_rg-cbazure_cb-akscluster_eastus",
+  "resourceGuid": "11b0ce13-6181-45ea-bae3-5203f1123bd8",
+  "sku": {
+    "name": "Basic",
+    "tier": "Regional"
+  },
+  "tags": {
+    "service": "ingress-basic/yodeling-elephant-nginx-ingress-controller"
+  },
+  "type": "Microsoft.Network/publicIPAddresses",
+  "zones": null
+}
+
+
+Updating the app
+
+muthusamy@Azure:~$ kubectl set image deployment cbprojectnode-app cbproject-app=acrcbazure.azurecr.io/cbproject_nide-app:v4
+
+to change namespace
+muthusamy@Azure:~$ kubectl config set-context --current --namespace=ingress-basic
