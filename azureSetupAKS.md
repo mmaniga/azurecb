@@ -206,7 +206,45 @@ kubectl autoscale deployment cbprojectnode-app --cpu-percent=20 --min=3 --max=10
 
 ```
 
+### To get namespaces
+```shell script
 
+kubectl get namespace
+
+```
+
+### To get port of all services in AKS
+```shell script
+kubectl get endpoints
+NAME                                            ENDPOINTS                                                AGE
+cbazuredemo-cbserver-lb                         10.244.2.5:8040                                          94m
+cbazuredemo-socketserver-lb                     10.244.0.7:8030                                          94m
+estranged-sloth-nginx-ingress-controller        10.244.1.4:80,10.244.2.4:80,10.244.1.4:443 + 1 more...   166m
+estranged-sloth-nginx-ingress-default-backend   10.244.1.3:8080                                          166m
+redis-server                                    10.244.1.5:6379      
+```
+
+### To get all services
+```shell script
+kubectl get services
+NAME                                            TYPE           CLUSTER-IP     EXTERNAL-IP     PORT(S)                      AGE
+cbazuredemo-cbserver-lb                         ClusterIP      10.0.155.48    <none>          8040/TCP                     96m
+cbazuredemo-socketserver-lb                     ClusterIP      10.0.184.230   <none>          8030/TCP                     96m
+estranged-sloth-nginx-ingress-controller        LoadBalancer   10.0.33.241    52.188.46.118   80:30424/TCP,443:31673/TCP   169m
+estranged-sloth-nginx-ingress-default-backend   ClusterIP      10.0.246.234   <none>          80/TCP                       169m
+redis-server                                    ClusterIP      10.0.5.233     <none>          6379/TCP                     98m
+
+```
+
+### To Get all context
+```shell script
+kubectl config get-contexts
+```
+
+### To Change context
+```shell script
+kubectl config use-context cb-akscluster
+```
 ## Deploy To Jenkins
 
 ### Setup Virtual Machines

@@ -2,7 +2,7 @@ apiVersion: apps/v1beta1
 kind: Deployment
 metadata:
   name: redis-server
-  namespace: ingress-basic
+  namespace: ingress-basic-oct
 spec:
   replicas: 1
   selector:
@@ -26,7 +26,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: redis-server
-  namespace: ingress-basic
+  namespace: ingress-basic-oct
 spec:
   ports:
     - port: 6379
@@ -36,8 +36,8 @@ spec:
 apiVersion: apps/v1beta1
 kind: Deployment
 metadata:
-  name: cbprojectnode-app
-  namespace: ingress-basic
+  name: cbazuredemo-cbserver
+  namespace: ingress-basic-oct
 spec:
   replicas: 1
   strategy:
@@ -48,13 +48,49 @@ spec:
   template:
     metadata:
       labels:
-        app: cbprojectnode-app
+        app: cbazuredemo-cbserver
     spec:
       nodeSelector:
         "beta.kubernetes.io/os": linux
       containers:
-        - name:  cbproject-app
-          image: acrcbazure.azurecr.io/cbproject_nide-app:v5
+        - name:  cbazuredemo-cbserver
+          image: azcrbrokeroct15.azurecr.io/cbazuredemo_cbserver:v1
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8040
+          resources:
+            requests:
+              cpu: 250m
+            limits:
+              cpu: 500m
+          env:
+            - name: REDIS
+              value: "redis-server"
+
+
+---
+apiVersion: apps/v1beta1
+kind: Deployment
+metadata:
+  name: cbazuredemo-socketserver
+  namespace: ingress-basic-oct
+spec:
+  replicas: 1
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+  minReadySeconds: 5
+  template:
+    metadata:
+      labels:
+        app: cbazuredemo-socketserver
+    spec:
+      nodeSelector:
+        "beta.kubernetes.io/os": linux
+      containers:
+        - name:  cbazuredemo-socketserver
+          image: azcrbrokeroct15.azurecr.io/cbazuredemo_socket-server:v1
           imagePullPolicy: Always
           ports:
             - containerPort: 8030
@@ -70,12 +106,26 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: cbprojectnode-app-lb
-  namespace: ingress-basic
+  name: cbazuredemo-cbserver-lb
+  namespace: ingress-basic-oct
+spec:
+  ports:
+    - port: 80
+      targetPort: 8040
+      protocol: TCP
+  selector:
+    app: cbazuredemo-cbserver
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: cbazuredemo-socketserver-lb
+  namespace: ingress-basic-oct
 spec:
   ports:
     - port: 80
       targetPort: 8030
       protocol: TCP
   selector:
-    app: cbprojectnode-app
+    app: cbazuredemo-socketserver

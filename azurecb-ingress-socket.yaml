@@ -1,17 +1,17 @@
 apiVersion: extensions/v1beta1
 kind: Ingress
 metadata:
-  name: cbwebsocket-mani
-  namespace : ingress-basic
+  name: cbwebsocket-mani-oct
+  namespace : ingress-basic-oct
   annotations:
     kubernetes.io/ingress.class: nginx
     nginx.ingress.kubernetes.io/rewrite-target: /
 spec:
   rules:
-    - host: demo-akscb-ingress.eastus.cloudapp.azure.com
+    - host: azure-cloudbroker-oct.eastus.cloudapp.azure.com
       http:
         paths:
           - path: /
             backend:
-              serviceName: cbprojectnode-app-lb
+              serviceName: cbazuredemo-socketserver-lb
               servicePort: 80
