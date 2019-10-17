@@ -54,7 +54,7 @@ spec:
         "beta.kubernetes.io/os": linux
       containers:
         - name:  cbazuredemo-cbserver
-          image: azcrbrokeroct15.azurecr.io/cbazuredemo_cbserver:v1
+          image: azcrbrokeroct15.azurecr.io/cbazuredemo_cbserver:v2
           imagePullPolicy: Always
           ports:
             - containerPort: 8040
@@ -66,9 +66,26 @@ spec:
           env:
             - name: REDIS
               value: "redis-server"
-
+            - name: SOCKET
+              value: "cbazuredemo-socketserver"
 
 ---
+apiVersion: v1
+kind: Service
+metadata:
+  name: cbazuredemo-cbserver-lb
+  namespace: ingress-basic-oct
+spec:
+  type: ClusterIP
+  ports:
+    - port: 8040
+      targetPort: 8040
+      protocol: TCP
+  selector:
+    app: cbazuredemo-cbserver
+
+---
+
 apiVersion: apps/v1beta1
 kind: Deployment
 metadata:
@@ -90,7 +107,7 @@ spec:
         "beta.kubernetes.io/os": linux
       containers:
         - name:  cbazuredemo-socketserver
-          image: azcrbrokeroct15.azurecr.io/cbazuredemo_socket-server:v1
+          image: azcrbrokeroct15.azurecr.io/cbazuredemo_socket-server:v2
           imagePullPolicy: Always
           ports:
             - containerPort: 8030
@@ -106,26 +123,40 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: cbazuredemo-cbserver-lb
-  namespace: ingress-basic-oct
-spec:
-  ports:
-    - port: 80
-      targetPort: 8040
-      protocol: TCP
-  selector:
-    app: cbazuredemo-cbserver
-
----
-apiVersion: v1
-kind: Service
-metadata:
   name: cbazuredemo-socketserver-lb
   namespace: ingress-basic-oct
 spec:
+  type: ClusterIP
   ports:
-    - port: 80
+    - port: 8030
       targetPort: 8030
       protocol: TCP
   selector:
     app: cbazuredemo-socketserver
+
+
+---
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: cbwebsocket-mani-oct
+  namespace : ingress-basic-oct
+  annotations:
+    kubernetes.io/ingress.class: nginx
+spec:
+  rules:
+    - host: azure-cloudbroker-oct.eastus.cloudapp.azure.com
+      http:
+        paths:
+          - path: /xmlapi
+            backend:
+              serviceName: cbazuredemo-cbserver-lb
+              servicePort: 8040
+          - path: /connect
+            backend:
+              serviceName: cbazuredemo-socketserver-lb
+              servicePort: 8030
+          - path: /callbackCS
+            backend:
+              serviceName: cbazuredemo-socketserver-lb
+              servicePort: 8030

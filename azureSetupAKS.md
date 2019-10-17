@@ -245,6 +245,19 @@ kubectl config get-contexts
 ```shell script
 kubectl config use-context cb-akscluster
 ```
+
+### To delete deployment
+```shell script
+kubectl delete -f azurecb-ingress-socket.yaml
+```
+
+
+
+### List images in registry
+```shell script
+az acr repository list --name azcrBrokerOct15 --output table
+
+```
 ## Deploy To Jenkins
 
 ### Setup Virtual Machines

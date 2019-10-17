@@ -40,7 +40,7 @@ app.post('/xmlapi',(req,res) => {
     request.post(
         {
         headers: {'content-type' : 'application/json'},
-            url: "http://host.docker.internal:8030/callbackCS",
+            url: "http://socket-server:8030/callbackCS",
             body: JSON.stringify(req.body)
         },
         function(error, response, body){
