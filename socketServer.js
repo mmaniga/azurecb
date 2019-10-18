@@ -118,7 +118,7 @@ app.post('/callbackCS',function (request, response) {
     console.log("CloudBroker sending message to Connection Server : " + clientConnecionID);
     console.table(request.body);
     publisher.publish(clientConnecionID,JSON.stringify(request.body))
-    response.end("yes");
+    response.end("Callback Response socket server");
 
 });
 

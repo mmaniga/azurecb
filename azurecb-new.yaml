@@ -54,7 +54,7 @@ spec:
         "beta.kubernetes.io/os": linux
       containers:
         - name:  cbazuredemo-cbserver
-          image: azcrbrokeroct15.azurecr.io/cbazuredemo_cbserver:v2
+          image: azcrbrokeroct15.azurecr.io/cbazuredemo_cbserver:v16
           imagePullPolicy: Always
           ports:
             - containerPort: 8040
@@ -107,7 +107,7 @@ spec:
         "beta.kubernetes.io/os": linux
       containers:
         - name:  cbazuredemo-socketserver
-          image: azcrbrokeroct15.azurecr.io/cbazuredemo_socket-server:v2
+          image: azcrbrokeroct15.azurecr.io/cbazuredemo_socket-server:v16
           imagePullPolicy: Always
           ports:
             - containerPort: 8030
@@ -119,6 +119,8 @@ spec:
           env:
             - name: REDIS
               value: "redis-server"
+            - name: SOCKET
+              value: "cbazuredemo-socketserver"
 ---
 apiVersion: v1
 kind: Service
@@ -145,8 +147,7 @@ metadata:
     kubernetes.io/ingress.class: nginx
 spec:
   rules:
-    - host: azure-cloudbroker-oct.eastus.cloudapp.azure.com
-      http:
+    - http:
         paths:
           - path: /xmlapi
             backend:

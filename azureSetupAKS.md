@@ -142,7 +142,8 @@ az network public-ip update --ids $PUBLICIPID --dns-name $DNSNAME
 ```
 ### To update and existing Image in ACR
 ```shell script
-kubectl set image deployment cbprojectnode-app cbproject-app=acrcbazure.azurecr.io/cbproject_nide-app:v4
+kubectl set image deployment cbazuredemo-socketserver cbazuredemo-socketserver=azcrbrokeroct15.azurecr.io/cbazuredemo_socket-server:v3
+kubectl set image deployment cbazuredemo-cbserver cbazuredemo-cbserver=azcrbrokeroct15.azurecr.io/cbazuredemo_cbserver:v3
 
 ```
 ### To see pods
