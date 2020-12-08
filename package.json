@@ -14,7 +14,7 @@
     "express": "^4.17.1",
     "express-ws": "^4.0.0",
     "express-ws-routes": "^1.1.0",
-    "fast-csv": "^3.4.0",
+    "fast-csv": "^4.3.6",
     "fs": "0.0.1-security",
     "line-reader": "^0.4.0",
     "loadtest": "^3.0.8",
