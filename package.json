@@ -18,7 +18,7 @@
     "fs": "0.0.1-security",
     "line-reader": "^0.4.0",
     "loadtest": "^3.0.8",
-    "nconf": "^0.10.0",
+    "nconf": "^0.11.4",
     "redis": "^2.8.0",
     "redis-client": "^0.3.5",
     "redis-commands": "^1.2.0",
